@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSE 168 Final Project — Volumetric Smoke Rendering</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #1a1a1a;
+      color: #d4d4d4;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #f0f0f0;
+      margin: 0 0 0.4rem;
+    }
+
+    .meta {
+      color: #888;
+      font-size: 13px;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid #2e2e2e;
+      padding-bottom: 1.2rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e8e8e8;
+      margin: 2.5rem 0 0.6rem;
+    }
+
+    p {
+      color: #b8b8b8;
+      margin: 0 0 0.9rem;
+    }
+
+    a { color: #7ab3d4; }
+
+    /* image placeholder */
+    .img-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #222;
+      border: 1px dashed #383838;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      font-size: 13px;
+      margin: 1.2rem 0;
+    }
+
+    ul {
+      color: #b8b8b8;
+      padding-left: 1.4rem;
+      margin: 0 0 0.9rem;
+    }
+
+    ul li { margin-bottom: 0.3rem; }
+
+    pre {
+      background: #111;
+      border: 1px solid #2e2e2e;
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      font-size: 12px;
+      color: #c8c8c8;
+      overflow-x: auto;
+      margin: 0.8rem 0 1.2rem;
+      line-height: 1.6;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #2e2e2e;
+      margin: 2.5rem 0;
+    }
+
+    footer {
+      color: #555;
+      font-size: 12px;
+      border-top: 1px solid #2e2e2e;
+      padding-top: 1.2rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1>CSE 168 Final Project — Volumetric Smoke Grenade Rendering</h1>
+  <div class="meta">
+    Camdon Dreisbach &nbsp;·&nbsp; Spring 2026 &nbsp;·&nbsp; UC San Diego &nbsp;·&nbsp;
+    <a href="https://cseweb.ucsd.edu/~viscomp/classes/cse168/sp26/finalproject.pdf">Project PDF</a>
+  </div>
+
+  <h2>Overview</h2>
+  <p>
+    This project extends an existing OptiX path tracer — built over homeworks 1–4 with GGX BRDFs,
+    next-event estimation, and multiple importance sampling — with full volumetric light transport.
+    The goal is to render a photorealistic smoke grenade scene: a metallic grenade body surrounded
+    by a billowing colored smoke plume.
+  </p>
+
+  <h2>Preliminary Image</h2>
+  <!-- Replace this div with: <img src="render.png" style="width:100%;border-radius:4px" alt="Preliminary render"> -->
+  <div class="img-placeholder">[ preliminary render — replace with your image ]</div>
+
+  <h2>Technical Approach</h2>
+  <p>Volumetric rendering requires solving the radiative transfer equation through a heterogeneous medium. The core components are:</p>
+  <ul>
+    <li><strong>Delta tracking (Woodcock tracking)</strong> — unbiased free-path sampling through heterogeneous volumes using a majorant extinction coefficient.</li>
+    <li><strong>Henyey-Greenstein phase function</strong> — single parameter <em>g</em> controls forward/backward scattering anisotropy; analytically importance-sampled.</li>
+    <li><strong>OpenVDB via NanoVDB</strong> — JangaFX's free CC0 EmberGen VDB assets (Grenade Dust Impact, Industrial Chimney Smoke) loaded as OptiX custom primitives.</li>
+    <li><strong>Chromatic scattering</strong> — per-channel RGB scattering coefficients to produce colored smoke.</li>
+    <li><strong>Volume NEE</strong> — next-event estimation extended into volumes with ratio-tracked transmittance shadow rays.</li>
+  </ul>
+
+  <p>
+    The VDB density fields come from <a href="https://jangafx.com/software/embergen/download/free-vdb-animations">JangaFX's free EmberGen animations</a>,
+    licensed CC0 (public domain).
+  </p>
+
+  <h2>Core Algorithm (Delta Tracking)</h2>
+<pre>// free-path sampling through heterogeneous volume
+float t = 0.f;
+while (true) {
+    t -= log(rnd(seed)) / sigma_t_max;      // sample under majorant
+    if (t >= tmax) break;                   // ray escaped
+
+    float density = sampleVDB(pos(t));
+    float sigma_t = (sigma_s + sigma_a) * density;
+
+    if (rnd(seed) < sigma_t / sigma_t_max) {
+        // real collision: scatter and sample direct light
+        radiance += transmittance * sigma_s * estimateDirect(pos, seed);
+        direction  = sampleHG(direction, g, seed);
+    }
+    // else null collision — keep marching
+}</pre>
+
+  <h2>Next Steps</h2>
+  <ul>
+    <li>Finish NanoVDB integration with OptiX custom primitive AABB intersection</li>
+    <li>Full delta tracking integrator replacing the current homogeneous fog test</li>
+    <li>Colored smoke via per-channel RGB scattering coefficients</li>
+    <li>Final hero image: grenade body (GGX metal) + smoke plume under area + environment lighting</li>
+  </ul>
+
+  <h2>References</h2>
+  <ul>
+    <li>Novák et al. 2018 — "Monte Carlo Methods for Volumetric Light Transport Simulation." (primary reference for delta/ratio tracking)</li>
+    <li>Woodcock et al. 1965 — original null-collision tracking method from neutron transport</li>
+    <li>Henyey & Greenstein 1941 — analytic phase function for scattering anisotropy</li>
+    <li>NVIDIA NanoVDB — GPU-native OpenVDB for OptiX/CUDA kernels</li>
+    <li>JangaFX EmberGen Free VDBs — CC0 fluid sim assets</li>
+  </ul>
+
+  <footer>
+    CSE 168 Spring 2026 &nbsp;·&nbsp; UC San Diego &nbsp;·&nbsp; Instructor: Ravi Ramamoorthi
+  </footer>
+
+</div>
+</body>
+</html>
