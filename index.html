@@ -115,6 +115,17 @@
     This projects extends the already existing Optix path tracer built through homeworks 1-4 with GGX BRDFS,
     next-event estimation, and multiple importance sampling. I wanted to work on rendering volumetric lighting/shading 
     of the CS2 smoke grenades. The goal is to render a photorealistic smoke grenade screen (not exactly how far I will get)
+
+    Implementation thoughts in progress:
+        -Initally started working on converting the .VDB file format into somethin that can be interpretable
+        -Found https://github.com/AcademySoftwareFoundation/openvdb parse what I need use "NanoVDB"
+        -Started work on Volumetric Box geometries
+        -I worked in render.cpp for some time to develop a connection to existing Optix to load VDB files
+        -implemtend on handling ray-AABB intersections for Optix for volumetric objects
+        -created file for the Volumetric integrator but skipped it to build some of the framework to test
+        -Add loading geometries into buildscene() to add a volume if a scene had one
+
+
   </p>
 
   <h2>Preliminary Image</h2>
