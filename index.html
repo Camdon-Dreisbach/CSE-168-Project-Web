@@ -116,18 +116,19 @@
     next-event estimation, and multiple importance sampling. I wanted to work on rendering volumetric lighting/shading 
     of the CS2 smoke grenades. The goal is to render a photorealistic smoke grenade screen (not exactly how far I will get)
 
-    Implementation thoughts in progress:
-        -Initally started working on converting the .VDB file format into somethin that can be interpretable
-        -Found https://github.com/AcademySoftwareFoundation/openvdb parse what I need use "NanoVDB"
-        -Started work on Volumetric Box geometries
-        -I worked in render.cpp for some time to develop a connection to existing Optix to load VDB files
-        -implemtend on handling ray-AABB intersections for Optix for volumetric objects
-        -created file for the Volumetric integrator but skipped it to build some of the framework to test
-        -Add loading geometries into buildscene() to add a volume if a scene had one
-        -Current VDB is broken as imports through cmake are having issues 
-        -quite embarassing the current Implementation through failure collecting test vdb files
-        -right now the usage it a randomly generated image of possible smoke cloud volumes
-
+    <h2>Implementation Thoughts In Progress</h2>
+    <ul>
+        <li>Initally started working on converting the .VDB file format into somethin that can be interpretable</li>
+        <li>Found <a href="https://github.com/AcademySoftwareFoundation/openvdb">NanoVDB</a> parse what I need use "NanoVDB"</li>
+        <li>Started work on Volumetric Box geometries</li>
+        <li>I worked in render.cpp for some time to develop a connection to existing Optix to load VDB files</li>
+        <li>implemtend on handling ray-AABB intersections for Optix for volumetric objects</li>
+        <li>created file for the Volumetric integrator but skipped it to build some of the framework to test</li>
+        <li>Add loading geometries into buildscene() to add a volume if a scene had one</li>
+        <li>Current VDB is broken as imports through cmake are having issues </li>
+        <li>quite embarassing the current Implementation through failure collecting test vdb files</li>
+        <li>right now the usage it a randomly generated image of possible smoke cloud volumes</li>
+    </ul>
 
   </p>
 
@@ -159,10 +160,10 @@
 
   <h2>References</h2>
   <ul>
-    <li>Novák et al. 2018 — "Monte Carlo Methods for Volumetric Light Transport Simulation." (primary reference for delta/ratio tracking)</li>
+    <!-- <li>Novák et al. 2018 — "Monte Carlo Methods for Volumetric Light Transport Simulation." (primary reference for delta/ratio tracking)</li>
     <li>Woodcock et al. 1965 — original null-collision tracking method from neutron transport</li>
     <li>Henyey & Greenstein 1941 — analytic phase function for scattering anisotropy</li>
-    <li>NVIDIA NanoVDB — GPU-native OpenVDB for OptiX/CUDA kernels</li>
+    <li>NVIDIA NanoVDB — GPU-native OpenVDB for OptiX/CUDA kernels</li> -->
     <li>JangaFX EmberGen Free VDBs — CC0 fluid sim assets</li>
   </ul>
 
