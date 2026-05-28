@@ -112,10 +112,9 @@
 
   <h2>Overview</h2>
   <p>
-    This project extends an existing OptiX path tracer — built over homeworks 1–4 with GGX BRDFs,
-    next-event estimation, and multiple importance sampling — with full volumetric light transport.
-    The goal is to render a photorealistic smoke grenade scene: a metallic grenade body surrounded
-    by a billowing colored smoke plume.
+    This projects extends the already existing Optix path tracer built through homeworks 1-4 with GGX BRDFS,
+    next-event estimation, and multiple importance sampling. I wanted to work on rendering volumetric lighting/shading 
+    of the CS2 smoke grenades. The goal is to render a photorealistic smoke grenade screen (not exactly how far I will get)
   </p>
 
   <h2>Preliminary Image</h2>
@@ -125,6 +124,7 @@
   <h2>Technical Approach</h2>
   <p>Volumetric rendering requires solving the radiative transfer equation through a heterogeneous medium. The core components are:</p>
   <ul>
+    <li>Currently Placeholder</li>
     <li><strong>Delta tracking (Woodcock tracking)</strong> — unbiased free-path sampling through heterogeneous volumes using a majorant extinction coefficient.</li>
     <li><strong>Henyey-Greenstein phase function</strong> — single parameter <em>g</em> controls forward/backward scattering anisotropy; analytically importance-sampled.</li>
     <li><strong>OpenVDB via NanoVDB</strong> — JangaFX's free CC0 EmberGen VDB assets (Grenade Dust Impact, Industrial Chimney Smoke) loaded as OptiX custom primitives.</li>
@@ -139,6 +139,7 @@
 
   <h2>Next Steps</h2>
   <ul>
+    <li>Currently Placeholder</li>
     <li>Finish NanoVDB integration with OptiX custom primitive AABB intersection</li>
     <li>Full delta tracking integrator replacing the current homogeneous fog test</li>
     <li>Colored smoke via per-channel RGB scattering coefficients</li>
@@ -147,6 +148,7 @@
 
   <h2>References</h2>
   <ul>
+    <li>Currently Placeholder</li>
     <li>Novák et al. 2018 — "Monte Carlo Methods for Volumetric Light Transport Simulation." (primary reference for delta/ratio tracking)</li>
     <li>Woodcock et al. 1965 — original null-collision tracking method from neutron transport</li>
     <li>Henyey & Greenstein 1941 — analytic phase function for scattering anisotropy</li>
