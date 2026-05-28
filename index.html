@@ -137,24 +137,6 @@
     licensed CC0 (public domain).
   </p>
 
-  <h2>Core Algorithm (Delta Tracking)</h2>
-<pre>// free-path sampling through heterogeneous volume
-float t = 0.f;
-while (true) {
-    t -= log(rnd(seed)) / sigma_t_max;      // sample under majorant
-    if (t >= tmax) break;                   // ray escaped
-
-    float density = sampleVDB(pos(t));
-    float sigma_t = (sigma_s + sigma_a) * density;
-
-    if (rnd(seed) < sigma_t / sigma_t_max) {
-        // real collision: scatter and sample direct light
-        radiance += transmittance * sigma_s * estimateDirect(pos, seed);
-        direction  = sampleHG(direction, g, seed);
-    }
-    // else null collision — keep marching
-}</pre>
-
   <h2>Next Steps</h2>
   <ul>
     <li>Finish NanoVDB integration with OptiX custom primitive AABB intersection</li>
