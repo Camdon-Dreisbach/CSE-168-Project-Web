@@ -15,20 +15,17 @@
       margin: 0;
       padding: 0;
     }
-
     .page {
       max-width: 760px;
       margin: 0 auto;
       padding: 4rem 2rem 6rem;
     }
-
     h1 {
       font-size: 1.8rem;
       font-weight: 600;
       color: #f0f0f0;
       margin: 0 0 0.4rem;
     }
-
     .meta {
       color: #888;
       font-size: 13px;
@@ -36,62 +33,45 @@
       border-bottom: 1px solid #2e2e2e;
       padding-bottom: 1.2rem;
     }
-
     h2 {
       font-size: 1.1rem;
       font-weight: 600;
       color: #e8e8e8;
       margin: 2.5rem 0 0.6rem;
     }
-
     p {
       color: #b8b8b8;
       margin: 0 0 0.9rem;
     }
-
     a { color: #7ab3d4; }
-
-    /* image placeholder */
-    .img-placeholder {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: #222;
-      border: 1px dashed #383838;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #555;
-      font-size: 13px;
-      margin: 1.2rem 0;
-    }
-
     ul {
       color: #b8b8b8;
       padding-left: 1.4rem;
       margin: 0 0 0.9rem;
     }
-
     ul li { margin-bottom: 0.3rem; }
-
-    pre {
-      background: #111;
-      border: 1px solid #2e2e2e;
-      border-radius: 4px;
-      padding: 1rem 1.2rem;
-      font-size: 12px;
-      color: #c8c8c8;
-      overflow-x: auto;
-      margin: 0.8rem 0 1.2rem;
-      line-height: 1.6;
+    .img-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.2rem 0;
     }
-
+    .img-pair img, .img-single img {
+      width: 100%;
+      border-radius: 4px;
+      display: block;
+    }
+    .img-caption {
+      font-size: 12px;
+      color: #666;
+      margin-top: 0.35rem;
+      line-height: 1.45;
+    }
     hr {
       border: none;
       border-top: 1px solid #2e2e2e;
       margin: 2.5rem 0;
     }
-
     footer {
       color: #555;
       font-size: 12px;
@@ -103,74 +83,67 @@
 </head>
 <body>
 <div class="page">
-
-  <h1>CSE 168 Final Project — Volumetric Smoke Grenade Rendering</h1>
+  <h1>CSE 168 Final Project — Volumetric Smoke Rendering</h1>
   <div class="meta">
-    Camdon Dreisbach &nbsp;·&nbsp; Spring 2026 &nbsp;·&nbsp; UC San Diego &nbsp;·&nbsp;
-    <a href="https://cseweb.ucsd.edu/~viscomp/classes/cse168/sp26/finalproject.pdf">Project PDF</a>
+    Camdon Dreisbach &nbsp;·&nbsp; Spring 2026 &nbsp;·&nbsp; UC San Diego
   </div>
 
   <h2>Overview</h2>
   <p>
-    This projects extends the already existing Optix path tracer built through homeworks 1-4 with GGX BRDFS,
-    next-event estimation, and multiple importance sampling. I wanted to work on rendering volumetric lighting/shading 
-    of the CS2 smoke grenades. The goal is to render a photorealistic smoke grenade screen (not exactly how far I will get)
-
-    <h2>Implementation Thoughts In Progress</h2>
-    <ul>
-        <li>Initally started working on converting the .VDB file format into somethin that can be interpretable</li>
-        <li>Found <a href="https://github.com/AcademySoftwareFoundation/openvdb">NanoVDB</a> parse what I need use "NanoVDB"</li>
-        <li>Started work on Volumetric Box geometries</li>
-        <li>I worked in render.cpp for some time to develop a connection to existing Optix to load VDB files</li>
-        <li>implemtend on handling ray-AABB intersections for Optix for volumetric objects</li>
-        <li>created file for the Volumetric integrator but skipped it to build some of the framework to test</li>
-        <li>Add loading geometries into buildscene() to add a volume if a scene had one</li>
-        <li>Current VDB is broken as imports through cmake are having issues </li>
-        <li>quite embarassing the current Implementation through failure collecting test vdb files</li>
-        <li>right now the usage it a randomly generated image of possible smoke cloud volumes</li>
-    </ul>
-
+    This project extends the OptiX path tracer built through Homeworks 1–4 — which already has GGX BRDFs,
+    next-event estimation, and multiple importance sampling — with volumetric light transport for
+    heterogeneous participating media. The goal was a photorealistic CS2-style smoke grenade screen.
   </p>
-
-  <h2>Preliminary Image</h2>
-  <img src="building_smoke.png" style="width:100%;border-radius:4px" alt="Preliminary render">
-
-  <h2>Technical Approach</h2>
-  <p>Volumetric rendering requires solving the radiative transfer equation through a heterogeneous medium. The core components are:</p>
-  <ul>
-    <li><strong>Delta tracking (Woodcock tracking)</strong> — unbiased free-path sampling through heterogeneous volumes using a majorant extinction coefficient.</li>
-    <li><strong>Henyey-Greenstein phase function</strong> — single parameter <em>g</em> controls forward/backward scattering anisotropy; analytically importance-sampled.</li>
-    <li><strong>OpenVDB via NanoVDB</strong> — JangaFX's free CC0 EmberGen VDB assets (Grenade Dust Impact, Industrial Chimney Smoke) loaded as OptiX custom primitives.</li>
-    <li><strong>Chromatic scattering</strong> — per-channel RGB scattering coefficients to produce colored smoke.</li>
-    <li><strong>Volume NEE</strong> — next-event estimation extended into volumes with ratio-tracked transmittance shadow rays.</li>
-  </ul>
-
   <p>
-    The VDB density fields come from <a href="https://jangafx.com/software/embergen/download/free-vdb-animations">JangaFX's free EmberGen animations</a>,
-    licensed CC0 (public domain).
+    The full pipeline was designed and implemented: custom AABB geometry in OptiX, a delta-tracking
+    integrator with Henyey-Greenstein phase sampling, volume NEE with transmittance shadow rays, and a
+    <code>.rawvdb</code> density loader. The VDB import broke at the CMake/NanoVDB linkage stage;
+    the renders below use a procedurally generated density field as a fallback.
   </p>
 
-  <h2>Next Steps</h2>
+  <h2>Renders</h2>
+  <div class="img-pair">
+    <div>
+      <img src="smoke.png" alt="Volumetric smoke render">
+      <div class="img-caption">Primary render. Procedural density field inside an AABB volume, lit by a quad area light with NEE. HG phase g = 0.3.</div>
+    </div>
+    <div>
+      <img src="smoke_contrast.png" alt="Volumetric smoke transmittance test">
+      <div class="img-caption">Transmittance test — same volume without the opaque cube. The shadow on the rear wall and floor is real volumetric attenuation through the medium.</div>
+    </div>
+  </div>
+
+  <h2>Implementation</h2>
   <ul>
-    <li>Finish NanoVDB integration with OptiX custom primitive AABB intersection</li>
-    <li>Full delta tracking integrator replacing the current homogeneous fog test</li>
-    <li>Colored smoke via per-channel RGB scattering coefficients</li>
-    <li>Final hero image: grenade body (GGX metal) + smoke plume under area + environment lighting</li>
+    <li><strong>Ray–AABB intersection</strong> — slab method registered as an OptiX custom primitive; flags the hit as a volume entry for the integrator.</li>
+    <li><strong>Trilinear density lookup</strong> — maps world position into [0,1]³ within the AABB and performs 8-corner trilinear interpolation over the voxel grid.</li>
+    <li><strong>Delta tracking (Woodcock)</strong> — free-path sampling under a scalar majorant <em>σ<sub>t,maj</sub></em>; real vs. null collision decided per-step against local density. Unbiased through heterogeneous media.</li>
+    <li><strong>Henyey-Greenstein phase function</strong> — analytic importance sampling via inversion formula; single parameter <em>g</em> controls forward/backward scattering anisotropy.</li>
+    <li><strong>Volume NEE</strong> — at each real collision, a shadow ray is traced to every quad light and weighted by phase function value and geometry term.</li>
+    <li><strong>Russian roulette + indirect scatter</strong> — throughput modulated by single-scattering albedo <em>σ<sub>s</sub>/σ<sub>t</sub></em>; surviving paths launch an indirect scatter ray, depth-limited to 8 events.</li>
+    <li><strong>.rawvdb loader</strong> — reads a binary header (<code>nx, ny, nz</code>) and a flat float32 voxel array exported from Houdini via a Python script, normalises to [0,1], and uploads to an OptiX buffer. The Houdini export script is in the testing folder. NanoVDB CMake linkage fails on the lab machines, so no real VDB data was loaded for the final renders.</li>
   </ul>
+
+  <h2>What the images show</h2>
+  <p>
+    Both renders use a procedural 3D noise field as a stand-in for real VDB data. The dark cloud-like
+    regions are high-density clusters where <em>σ<sub>t</sub></em> is large enough to absorb most incident
+    light. The contrast render is more technically telling — the darker patch on the rear wall and floor
+    is real volumetric attenuation: shadow rays from those surface points pass through the medium and are
+    weighted by transmittance, reducing the NEE contribution.
+  </p>
 
   <h2>References</h2>
   <ul>
-    <!-- <li>Novák et al. 2018 — "Monte Carlo Methods for Volumetric Light Transport Simulation." (primary reference for delta/ratio tracking)</li>
+    <li>Novák et al. 2018 — "Monte Carlo Methods for Volumetric Light Transport Simulation" (primary reference for delta/ratio tracking)</li>
     <li>Woodcock et al. 1965 — original null-collision tracking method from neutron transport</li>
-    <li>Henyey & Greenstein 1941 — analytic phase function for scattering anisotropy</li>
-    <li>NVIDIA NanoVDB — GPU-native OpenVDB for OptiX/CUDA kernels</li> -->
-    <li>JangaFX EmberGen Free VDBs — CC0 fluid sim assets</li>
+    <li>Henyey &amp; Greenstein 1941 — analytic phase function for scattering anisotropy</li>
+    <li>JangaFX EmberGen Free VDBs — CC0 fluid sim assets (target data, unused due to VDB breakage)</li>
   </ul>
 
   <footer>
-    CSE 168 Spring 2026 &nbsp;·&nbsp; UC San Diego &nbsp;·&nbsp; Instructor: Ravi Ramamoorthi
+    CSE 168 Spring 2026 &nbsp;·&nbsp; UC San Diego &nbsp;·&nbsp; Professor: Ravi Ramamoorthi
   </footer>
-
 </div>
 </body>
 </html>
