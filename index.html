@@ -92,13 +92,25 @@
   <p>
     This project extends the OptiX path tracer built through Homeworks 1–4 — which already has GGX BRDFs,
     next-event estimation, and multiple importance sampling — with volumetric light transport for
-    heterogeneous participating media. The goal was a photorealistic CS2-style smoke grenade screen.
+    heterogeneous participating media. The goal was a photorealistic CS2-style smoke grenade screen. However
+    simply the smoke rendering proved to be challenging initself.
   </p>
   <p>
     The full pipeline was designed and implemented: custom AABB geometry in OptiX, a delta-tracking
     integrator with Henyey-Greenstein phase sampling, volume NEE with transmittance shadow rays, and a
     <code>.rawvdb</code> density loader. The VDB import broke at the CMake/NanoVDB linkage stage;
-    the renders below use a procedurally generated density field as a fallback.
+    the renders below use a procedurally generated density field as a fallback. That was later replaced 
+    using Houdini shell python that is noted within scene / final this is executed to export following vdb
+    to rawvdb. I am not a current fan of my implemnetation as I was working on theoertical temperature etc. 
+    Some of the corresponding code is deleted and others is written in broken_ format for multiple channels
+    of geometry, temperature.
+  </p>
+
+  <h2>Disappointment</h2>
+  <p>
+    This is some achknowledgment of honestly the lack of time and effort dedicated. I had innumerable issues with
+    getting effective geometry to framework the rendering and their was likely alternatives that I could have used.
+    instead of openVDB and or houdini to obtain raw vdb daw to process
   </p>
 
   <h2>Renders</h2>
@@ -121,7 +133,7 @@
     <li><strong>Henyey-Greenstein phase function</strong> — analytic importance sampling via inversion formula; single parameter <em>g</em> controls forward/backward scattering anisotropy.</li>
     <li><strong>Volume NEE</strong> — at each real collision, a shadow ray is traced to every quad light and weighted by phase function value and geometry term.</li>
     <li><strong>Russian roulette + indirect scatter</strong> — throughput modulated by single-scattering albedo <em>σ<sub>s</sub>/σ<sub>t</sub></em>; surviving paths launch an indirect scatter ray, depth-limited to 8 events.</li>
-    <li><strong>.rawvdb loader</strong> — reads a binary header (<code>nx, ny, nz</code>) and a flat float32 voxel array exported from Houdini via a Python script, normalises to [0,1], and uploads to an OptiX buffer. The Houdini export script is in the testing folder. NanoVDB CMake linkage fails on the lab machines, so no real VDB data was loaded for the final renders.</li>
+    <li><strong>.rawvdb loader</strong> — reads a binary header (<code>nx, ny, nz</code>) and a flat float32 voxel array exported from Houdini via a Python script, normalises to [0,1], and uploads to an OptiX buffer. The Houdini export script is in the testing folder. NanoVDB CMake linkage fails on the lab machines, so only rawVDB data was loaded for the final renders.</li>
   </ul>
 
   <h2>What the images show</h2>
